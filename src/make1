@@ -1,0 +1,5 @@
+#
+# Makes a single program, e.g., ./make1 examples/ring1
+#
+export _T_=$1
+make $1

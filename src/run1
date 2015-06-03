@@ -1,0 +1,6 @@
+#
+# (Makes if necessary and) runs a single program, e.g., ./run1 examples/ring1
+#
+export _T_=$1
+make run
+

@@ -1,0 +1,19 @@
+
+SOURCES = memory.c timer.c sched.c hardware-empty.c
+HDRS = memory.h timer.h sched.h timer.h atomic.h internals/timer.h internals/sched.h 
+OBJS = ${SOURCES:.c=.o}
+
+clean:
+	-rm ${OBJS}
+
+size:	${OBJS}
+	ld -melf_i386 -o $@ -Ttext 0x0 $^ --oformat binary
+
+%.o:	%.c ${HDRS}
+	gcc -m32 -ffreestanding -c -Os -s $< -o $@
+
+
+
+# $^ means all dependencies
+# $< means the first dependency
+# $@ means the target
