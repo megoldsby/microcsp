@@ -1,7 +1,7 @@
 
-In order to reproduce the timings results of the timing tests
-(such as ring1 or commstime), first comment out the bodies
-of the enable_interrupts and disable_interrupts functions
-in hardware.c, making them no-ops.  Doing so takes the
-extreme inefficiency of setting signal masks to enable and
-disable interrupts out of the equation.
+To build a single program, use make1.  To (build and) run a single program use run1.  For example, 
+    ./run1 examples/ring1
+
+In order to reproduce the timings results of the timing tests (such as ring1 or commstime), first comment out the bodies
+of the enable_interrupts and disable_interrupts functions in hardware.c, making them no-ops.  Doing so takes the
+extreme inefficiency of setting signal masks to enable and disable interrupts out of the equation.
