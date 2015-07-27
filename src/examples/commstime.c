@@ -4,6 +4,7 @@
  */
 #include "microcsp.h"
 #include <stdio.h>
+#define REPORT_INTERVAL 1000000
 
 /** Prefix process */
 PROCESS(Prefix)
@@ -112,10 +113,13 @@ void Consume_rtc(void *local)
         activate(consume->guards);
         consume->t0 = Now();       // starting time
     } else {
-        if (consume->x % 1000000 == 0 && consume->x > 0) {
+        if (consume->x % REPORT_INTERVAL == 0 && consume->x > 0) {
             Time t = Now();     
-            double rate = (double)(t - consume->t0) / consume->x;
-            printf("Rate = %g nsec per cycle\n", rate);
+            printf("Time = %llu nsec\n", (unsigned long long)t);
+            double rate = (double)(t - consume->t0) / REPORT_INTERVAL;
+            printf("Time per loop = %g nsec\n", rate);
+            printf("Context switch = %g nsec\n", (rate/4));
+            consume->t0 = Now();   // starting time
         }
     }
 }
