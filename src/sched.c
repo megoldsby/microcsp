@@ -174,7 +174,15 @@ static void append(Process *proc)
         queue->head = proc;
         priority_mask |= mask[proc->pri];  // show ready process at level pri
     }
-    
+/****
+    if (queue->head != NULL) {
+        proc->next = queue->head;
+    } else {
+        proc->next = NULL;
+        priority_mask |= mask[proc->pri];  // show ready process at level pri
+    }    
+    queue->head = proc;
+****/
 }
 
 /**
@@ -708,23 +716,24 @@ Printf("In idle process\n");
 void schedule(int base_pri)
 {
     // INTERRUPTS DISABLED
+    Process *proc = NULL;     // the process running in this scheduler   //X
     while (true) {                                                       //X
                                                                          //X
-        // process running in this scheduler                             //X
-        Process *proc;                                                   //X
+        if (proc == NULL) {                                              //X
                                                                          //X
-        // get highest priority for which there is a                     //X
-        // ready process enqueued                                        //X
-        int highest = highest_ready();                                   //X
+            // get highest priority for which there is a                 //X
+            // ready process enqueued                                    //X
+            int highest = highest_ready();                               //X
                                                                          //X
-        // return if it's no higher than that of previously              //X
-        // running scheduler                                             //X
-        if (highest <= base_pri) {                                       //X
-            return;                                                      //X
+            // return if it's no higher than that of previously          //X
+            // running scheduler                                         //X
+            if (highest <= base_pri) {                                   //X
+                return;                                                  //X
+            }                                                            //X
+                                                                         //X
+            // take highest-priority ready process current               //X
+            proc = current = take(highest);                              //X
         }                                                                //X
-                                                                         //X
-        // take highest-priority ready process current                   //X
-        proc = current = take(highest);                                  //X
                                                                          //X
         // get scheduling state of current process                       //X
         int state = proc->state;                                         //X
@@ -815,11 +824,12 @@ void schedule(int base_pri)
         // if process has terminated, release its process record         //X
         if (proc->state == PROC_DONE) {                                  //X
             release_mem(proc->index, (char *)proc);                      //X
+            proc = NULL;                                                 //X
                                                                          //X
-        // if process is not waiting (for i/o, timeout or interrupt),    //X
-        // append process to its ready queue                             //X
-        } else if (proc->state != PROC_WAITING) {                        //X
-            append(proc);                                                //X
+        // if process is waiting (for i/o, timeout or interrupt),        //X
+        // prepare to select new process                                 //X
+        } else if (proc->state == PROC_WAITING) {                        //X
+            proc = NULL;                                                 //X
         }                                                                //X
                                                                          //X
     }//while                                                             //X
